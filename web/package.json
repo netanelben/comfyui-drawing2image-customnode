@@ -15,6 +15,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-sketch-canvas": "^6.2.0",
+    "throttleit": "^2.1.0",
     "uuid": "^10.0.0",
     "uuidv4": "^6.2.13"
   },

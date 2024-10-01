@@ -17,6 +17,9 @@ importers:
       react-sketch-canvas:
         specifier: ^6.2.0
         version: 6.2.0(react@18.3.1)
+      throttleit:
+        specifier: ^2.1.0
+        version: 2.1.0
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -1020,6 +1023,10 @@ packages:
 
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
+
+  throttleit@2.1.0:
+    resolution: {integrity: sha512-nt6AMGKW1p/70DF/hGBdJB57B8Tspmbp5gfJ8ilhLnt7kkr2ye7hzD6NVG8GGErk2HWF34igrL2CXmNIkzKqKw==}
+    engines: {node: '>=18'}
 
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
@@ -2041,6 +2048,8 @@ snapshots:
       has-flag: 4.0.0
 
   text-table@0.2.0: {}
+
+  throttleit@2.1.0: {}
 
   to-fast-properties@2.0.0: {}
 

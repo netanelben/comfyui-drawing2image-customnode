@@ -5,11 +5,12 @@ import workflow from "./workflows/workflow_api.json";
 
 import "./App.css";
 import { DrawingCanvas } from "./drawing-canvas";
+import { PromptStyles } from "./prompt-styles";
 
 const clientUniqueId = uuidv4();
 
 function App() {
-  const [text, settext] = useState("");
+  const [promptText, setPrompt] = useState("");
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [progress, setprogress] = useState({ value: 0, max: 0 });
   const [imageFileName, setImageFileName] = useState<string | null>(null);
@@ -55,22 +56,21 @@ function App() {
 
   const handleTextChange = (e: any) => {
     const text = e.target.value;
-    settext(text);
+    setPrompt(text);
   };
 
   const handleGenerate = async (e: any) => {
-    if (!text) return;
+    if (!promptText) return;
     if (typeof workflow === "undefined") return;
 
     // Find the key of prompt node
     const inputNodeNumber = Object.entries(workflow).find(
-      ([key, value]) =>
-        value["_meta"].title === "CLIP Text Encode (Positive Prompt)"
+      ([key, value]) => value["_meta"].title === "CLIP Text Encode (Positive)"
     )[0] as keyof typeof workflow;
 
     // Find the key of KSampler node
     const samplerNodeNumber = Object.entries(workflow).find(
-      ([key, value]) => value.class_type === "KSampler"
+      ([key, value]) => value.class_type === "SamplerCustom"
     )[0] as keyof typeof workflow;
 
     // Find the key of Image Input node
@@ -78,12 +78,12 @@ function App() {
       ([key, value]) => value.class_type === "LoadImage"
     )[0] as keyof typeof workflow;
 
-    workflow[inputNodeNumber].inputs.text = text.replaceAll(
+    workflow[inputNodeNumber].inputs.text = promptText.replaceAll(
       /\r\n|\n|\r/gm,
       " "
     );
 
-    workflow[samplerNodeNumber].inputs.seed = Math.floor(
+    workflow[samplerNodeNumber].inputs.noise_seed = Math.floor(
       Math.random() * 9999999999
     );
 
@@ -120,27 +120,9 @@ function App() {
     console.log("❌ Interrupting prompt", response);
   }
 
-  // const handleCapture = () => {
-  //   if (canvasRef.current && videoRef.current) {
-  //     const context = canvasRef.current.getContext("2d");
-  //     if (context) {
-  //       context.drawImage(
-  //         videoRef.current,
-  //         0,
-  //         0,
-  //         canvasRef.current.width,
-  //         canvasRef.current.height
-  //       );
-  //       const data = canvasRef.current.toDataURL("image/png");
-  //       setImageSrc(data);
-  //       console.log("📸 Image captured", data);
-  //       uploadFile(data);
-  //       setImageFileName("captured-image.png");
-  //     }
-  //   }
-  // };
-
   const uploadFile = (dataURL: any) => {
+    setImageFileName("captured-image.png");
+
     const blob = dataURLToBlob(dataURL);
     const formData = new FormData();
 
@@ -184,20 +166,25 @@ function App() {
           style={{
             display: "flex",
             gap: "1rem",
+            width: "640px",
+            height: "480px",
+            backgroundColor: "black",
           }}
-        >
-          <div
-            style={{
-              width: 640,
-              height: 480,
-              backgroundColor: "darkgray",
-            }}
-          >
-            <DrawingCanvas uploadFile={uploadFile} />
-          </div>
-        </div>
+        />
       )}
-
+      <div
+        style={{
+          width: 640,
+          height: 480,
+          backgroundColor: "darkgray",
+          position: "relative",
+        }}
+      >
+        <DrawingCanvas
+          uploadFile={uploadFile}
+          handleGenerate={handleGenerate}
+        />
+      </div>
       <textarea
         placeholder="Prompt"
         onChange={handleTextChange}
@@ -206,6 +193,7 @@ function App() {
           padding: 10,
         }}
       />
+      <PromptStyles setPrompt={setPrompt} />
       <div
         style={{
           display: "flex",

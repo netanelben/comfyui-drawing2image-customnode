@@ -1,88 +1,112 @@
 {
-  "1": {
+  "4": {
     "inputs": {
-      "ckpt_name": "dreamshaper_8.safetensors"
+      "ckpt_name": "photon_v1.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
       "title": "Load Checkpoint"
     }
   },
-  "2": {
-    "inputs": {
-      "text": "beautiful dark landscape",
-      "clip": ["1", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Positive Prompt)"
-    }
-  },
-  "5": {
-    "inputs": {
-      "text": "horror",
-      "clip": ["1", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
   "6": {
     "inputs": {
-      "image": "",
-      "upload": "image"
+      "text": "",
+      "clip": ["4", 1]
     },
-    "class_type": "LoadImage",
+    "class_type": "CLIPTextEncode",
     "_meta": {
-      "title": "Load Image"
+      "title": "CLIP Text Encode (Positive)"
     }
   },
   "7": {
     "inputs": {
-      "samples": ["9", 0],
-      "vae": ["1", 2]
+      "text": "",
+      "clip": ["4", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Negative)"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": ["28", 0],
+      "vae": ["4", 2]
     },
     "class_type": "VAEDecode",
     "_meta": {
       "title": "VAE Decode"
     }
   },
-  "8": {
+  "22": {
     "inputs": {
-      "pixels": ["6", 0],
-      "vae": ["1", 2]
+      "filename_prefix": "Result",
+      "images": ["8", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "26": {
+    "inputs": {
+      "pixels": ["33", 0],
+      "vae": ["4", 2]
     },
     "class_type": "VAEEncode",
     "_meta": {
       "title": "VAE Encode"
     }
   },
-  "9": {
+  "27": {
     "inputs": {
-      "seed": 336540162721766,
-      "steps": 30,
-      "cfg": 8,
-      "sampler_name": "euler",
-      "scheduler": "normal",
+      "steps": 1,
+      "scheduler": "sgm_uniform",
       "denoise": 0.5,
-      "model": ["1", 0],
-      "positive": ["2", 0],
-      "negative": ["5", 0],
-      "latent_image": ["8", 0]
+      "eta": 0.8,
+      "model": ["29", 0]
     },
-    "class_type": "KSampler",
+    "class_type": "TCDModelSamplingDiscrete",
     "_meta": {
-      "title": "KSampler"
+      "title": "TCD Model Sampling Discrete"
     }
   },
-  "10": {
+  "28": {
     "inputs": {
-      "images": ["7", 0]
+      "add_noise": true,
+      "noise_seed": 371677987928901,
+      "cfg": 1,
+      "model": ["27", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "sampler": ["27", 1],
+      "sigmas": ["27", 2],
+      "latent_image": ["26", 0]
     },
-    "class_type": "PreviewImage",
+    "class_type": "SamplerCustom",
     "_meta": {
-      "title": "Preview Image"
+      "title": "SamplerCustom"
+    }
+  },
+  "29": {
+    "inputs": {
+      "lora_name": "Hyper-SD15-1step-lora.safetensors",
+      "strength_model": 1,
+      "model": ["4", 0]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "LoraLoaderModelOnly"
+    }
+  },
+  "33": {
+    "inputs": {
+      "image": "captured-image.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
     }
   }
 }

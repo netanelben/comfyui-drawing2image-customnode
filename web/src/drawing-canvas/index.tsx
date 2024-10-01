@@ -1,17 +1,31 @@
+import throttle from "throttleit";
 import { useRef, useState, type ChangeEvent } from "react";
 import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
 
-export const DrawingCanvas = ({ uploadFile }) => {
+export const DrawingCanvas = ({ uploadFile, handleGenerate }) => {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
   const [eraseMode, setEraseMode] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(5);
   const [eraserWidth, setEraserWidth] = useState(10);
+  const [strokeColor, setStrokeColor] = useState("#000000");
+  const [canvasColor, setCanvasColor] = useState("#ffffff");
+
+  const handleStrokeColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setStrokeColor(event.target.value);
+  };
+
+  const handleCanvasColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCanvasColor(event.target.value);
+  };
 
   const handleExportImage = () => {
     canvasRef.current?.exportImage("jpeg").then((image) => {
       uploadFile(image);
+      handleGenerate();
     });
   };
+
+  const throttledExportImage = throttle(handleExportImage, 1000);
 
   const handleEraserClick = () => {
     setEraseMode(true);
@@ -35,27 +49,40 @@ export const DrawingCanvas = ({ uploadFile }) => {
     <>
       <div
         style={{
-          marginTop: "-4rem",
+          position: "absolute",
+          left: -580,
+          top: 80,
+          transform: "rotate(-90deg)",
           display: "flex",
           gap: "1rem",
           alignItems: "center",
         }}
       >
-        <button
-          type="button"
-          className="btn btn-sm btn-outline-primary"
-          disabled={!eraseMode}
-          onClick={handlePenClick}
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            alignItems: "center",
+          }}
         >
-          Pen
+          <label htmlFor="color">Pen color</label>
+          <input
+            type="color"
+            value={strokeColor}
+            onChange={handleStrokeColorChange}
+          />
+          <label htmlFor="color">Background color</label>
+          <input
+            type="color"
+            value={canvasColor}
+            onChange={handleCanvasColorChange}
+          />
+        </div>
+        <button type="button" disabled={!eraseMode} onClick={handlePenClick}>
+          🖌️
         </button>
-        <button
-          type="button"
-          className="btn btn-sm btn-outline-primary"
-          disabled={eraseMode}
-          onClick={handleEraserClick}
-        >
-          Eraser
+        <button type="button" disabled={eraseMode} onClick={handleEraserClick}>
+          Erase
         </button>
         <label htmlFor="strokeWidth" className="form-label">
           Stroke width
@@ -88,17 +115,17 @@ export const DrawingCanvas = ({ uploadFile }) => {
       </div>
       <ReactSketchCanvas
         ref={canvasRef}
+        onStroke={throttledExportImage}
+        strokeColor={strokeColor}
+        canvasColor={canvasColor}
         strokeWidth={strokeWidth}
         eraserWidth={eraserWidth}
         width="100%"
         height="100%"
-        canvasColor="transparent"
-        strokeColor="#a855f7"
         style={{
           border: 0,
         }}
       />
-      <button onClick={handleExportImage}>EXPORT</button>
     </>
   );
 };
